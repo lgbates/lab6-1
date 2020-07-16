@@ -23,9 +23,16 @@ dec=0.7 # set weight decrement for habituation
 pls=[0, 0, 1, 0, 0] # set up a pulse
 
 # TODO: then create a list of 6 pulses, called x, to use for input
-x = pls*6
+x = pls*6 + [0]*10 + pls*6
 
 v = stv # Set connection weight to start weight value
+
+forgetflag = True # Allows the model to simulat the process of 
+                  # forgetting the new association that it learned 
+                  # I f the pulse is not felt for awhile, forget that 
+                  # it has recently been safe to feel the pulse and 
+                  # to not react (because ov millions of years, it was 
+                  # *not* safe to not react to that stimulation)
 
 ###############################
 # Set up and run simulation
@@ -50,7 +57,10 @@ for t in range(nTs):
     
     if x[t]>0: # some stimulation occurred
         v *= dec # decrement weight
-        
+       
+    if t>3 and sum(x[t-4:t])==0 and v<stv and forgetflag:
+        v += (stv-v)*0.05 # let's forget this association we just learned  
+                          # if it doesn't happend for awhile
 
 #     then indent 4 spaces and write the equation that
 #     describes how each input value in the vector x is 
